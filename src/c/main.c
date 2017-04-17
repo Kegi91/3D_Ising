@@ -3,9 +3,11 @@
 #include <stdlib.h>
 #include "ising.h"
 #include "utils.h"
+#include "pcg/pcg_basic.h"
 
 int main() {
-  seed();
+  pcg32_random_t rng;
+  seed(&rng);
   int n = 3*3*3;
 
   double J = -1;
@@ -18,14 +20,15 @@ int main() {
   int flipped = 0;
   double *b_factors = boltzmann_factors(18,J);
 
-  for (int i = 0; i < 100000; i++) {
-    if (update_spin(3,2,2,2,spins,b_factors,J)) {
+  for (int i = 0; i < 2e6; i++) {
+    if (update_spin(3,2,2,2,spins,b_factors,J,&rng)) {
       flipped++;
       spins[index(2,2,2,3)] = -1;
     }
   }
 
-  printf("%f\n", (double)flipped/100000);
+  free(b_factors);
+  printf("%f\n", (double)flipped/2e6);
 
   return 0;
 }

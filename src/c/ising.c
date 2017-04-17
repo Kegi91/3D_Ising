@@ -2,14 +2,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "utils.h"
+#include "pcg/pcg_basic.h"
 #include "ising.h"
 
 //initializing the array with random spin configuration
-int *initial_array(int n) {
+int *initial_array(int n, pcg32_random_t *rng) {
   int *array = malloc_int(n);
 
   for (int i = 0; i<n*n*n; i++) {
-    if (rand_d() > 0.5) {
+    if (rand_d(rng) > 0.5) {
       array[i] = 1;
     } else {
       array[i] = -1;
@@ -87,12 +88,14 @@ double *boltzmann_factors(double T, double J) {
 
 /*Flipping a single spin according to the Metropolis algorithm
   Returns 1 of spin is flipped and 0 if not*/
-int update_spin(int n, int i, int j, int k, int *array, double *b_factors, double J) {
+int update_spin(int n, int i, int j, int k,
+                int *array, double *b_factors, double J, pcg32_random_t *rng) {
+
   double En = E(i,j,k,array,n,J);
   int idx = fabs(En/J)+0.1; //+0.1 to negotiate floating point inaccuracy
   double b_factor = b_factors[idx-1];
 
-  if (En > 0 || rand_d() < b_factor) {
+  if (En > 0 || rand_d(rng) < b_factor) {
     array[index(i,j,k,n)] = array[index(i,j,k,n)] * -1;
     return 1;
   }
@@ -129,7 +132,13 @@ double *simulation(int n, int mc_steps, int trans_steps, double T, double J) {
     J =           The coupling constant of the spin interaction
   */
 
-  int *spins = initial_array(n);
+  pcg32_random_t rng;
+  seed(&rng);
+  /*If multiple simulations are run the PRNG is seeded each time
+    Since the seed uses both system time and the address of the pointer &rng
+    it is highly unlikely the same seed is given*/
+
+  int *spins = initial_array(n, &rng);
   double *b_factors = boltzmann_factors(T,J);
 
   //Transient steps

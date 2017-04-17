@@ -1,14 +1,22 @@
 #include <time.h>
+#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "pcg/pcg_basic.h"
 
-void seed() {
-  //The initial seed. Should be called only once per run
-  srand(time(NULL));
+//Seeding the PRNG
+void seed(pcg32_random_t *rng) {
+  pcg32_srandom_r(rng, time(NULL), (intptr_t)rng);
 }
 
-double rand_d() {
-  return (double)rand()/(double)RAND_MAX;
+//Returns a double in the range [0,1)
+double rand_d(pcg32_random_t *rng) {
+  return ldexp(pcg32_random_r(rng), -32);
+}
+
+//Returns integer x in the range 0 <= x < lim
+int rand_int(int lim, pcg32_random_t *rng) {
+  return pcg32_boundedrand_r(rng, lim);
 }
 
 /*allocating the memory for the array

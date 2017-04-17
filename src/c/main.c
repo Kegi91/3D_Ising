@@ -6,23 +6,26 @@
 
 int main() {
   seed();
-  int *array = initial_array(200);
+  int n = 3*3*3;
 
-  /*testing the function E()
-    sum over random spin configurations energies divided
-    by number of spins should be ~0
-  */
+  double J = -1;
+  int spins[n];
+  for (int i = 0; i < n; i++) {
+    spins[i] = -1;
+  }
 
-  int sum = 0;
-  for (int i = 0; i<200; i++) {
-    for (int j = 0; j<200; j++) {
-      for (int k = 0; k<200; k++) {
-        sum += E(i,j,k,array,200,-1);
-      }
+  //testing single flip. The spin should be flipped with ~0.5134 probability
+  int flipped = 0;
+  double *b_factors = boltzmann_factors(18,J);
+
+  for (int i = 0; i < 100000; i++) {
+    if (update_spin(3,2,2,2,spins,b_factors,J)) {
+      flipped++;
+      spins[index(2,2,2,3)] = -1;
     }
   }
 
-  free(array);
-  printf("%f\n", sum/pow(200,3));
+  printf("%f\n", (double)flipped/100000);
+
   return 0;
 }

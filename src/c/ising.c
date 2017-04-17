@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "utils.h"
 #include "ising.h"
 
@@ -19,7 +20,7 @@ int *initial_array(int n) {
 }
 
 //Energy of a single spin
-int E(int i, int j, int k, int *array, int n, double J) {
+double E(int i, int j, int k, int *array, int n, double J) {
   int up,down,left,right,front,back; //neighbour spins
 
   //Checking the periodic boundary conditions
@@ -60,4 +61,84 @@ int E(int i, int j, int k, int *array, int n, double J) {
   }
 
   return J*array[index(i,j,k,n)]*(left+right+up+down+front+back);
+}
+
+/*Returns an array of all the Boltzmann factors
+  corresponding to different energies E<0.
+  The factors are calculated beforehand to avoid
+  calling exponential function on every iteration
+  of the main loop*/
+double *boltzmann_factors(double T, double J) {
+  double *bf = malloc_double(6);
+
+  //Loop over different energies E=J*i < 0
+  if (J > 0) {
+    for (int i = -6; i<0; i++) {
+      bf[-1*(i+1)] = exp(2*J*i/T);
+    }
+  } else {
+    for (int i = 6; i>0; i--) {
+      bf[i-1] = exp(2*J*i/T);
+    }
+  }
+
+  return bf;
+}
+
+/*Flipping a single spin according to the Metropolis algorithm
+  Returns 1 of spin is flipped and 0 if not*/
+int update_spin(int n, int i, int j, int k, int *array, double *b_factors, double J) {
+  double En = E(i,j,k,array,n,J);
+  int idx = fabs(En/J)+0.1; //+0.1 to negotiate floating point inaccuracy
+  double b_factor = b_factors[idx-1];
+
+  if (En > 0 || rand_d() < b_factor) {
+    array[index(i,j,k,n)] = array[index(i,j,k,n)] * -1;
+    return 1;
+  }
+
+  return 0;
+}
+
+//A single simulation
+double *simulation(int n, int mc_steps, int trans_steps, double T, double J) {
+  /*This function initializes the spin array and runs the simulation
+    using Metropolis algorithm to find the minimum of the free energy.
+
+    First transient mc steps are run after which the system is assumed to be
+    at equilibrium with the heat bath. After that the mc steps are run and
+    the means of the needed physical quantities are calculated and returned.
+
+    Notice: Seed needs to be given for the PRNG before calling this function.
+            Seed should be given only once and can be done by calling the
+            function seed() of utils.h.
+
+    Parameters:
+
+    n =           Cubic root of the number of the spin array elements.
+                  i.e. lenght of an edge
+
+    mc_steps =    Number of single spin flips = mc_steps * n^3
+
+    trans_steps = Number of mc_steps before starting to calculate the means.
+                  The system needs to be near the equilibrium after trans_steps
+                  are run.
+
+    T =           The temperature of the system
+
+    J =           The coupling constant of the spin interaction
+  */
+
+  int *spins = initial_array(n);
+  double *b_factors = boltzmann_factors(T,J);
+
+  //Transient steps
+  for (int i = 0; i < trans_steps; i++) {
+    for (int j = 0; j < n*n*n; j++) {
+      //update_spin();
+    }
+  }
+
+  free(spins);
+  return NULL;
 }

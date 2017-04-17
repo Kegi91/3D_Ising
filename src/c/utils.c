@@ -22,6 +22,14 @@ int *malloc_int(int n) {
   return array;
 }
 
+double *malloc_double(int n) {
+  double *array = malloc(n*n*n*sizeof(double));
+  if (array == NULL) {
+    fprintf(stderr, "%s\n", "ERROR allocating memory");
+  }
+  return array;
+}
+
 //converts 3D index to the actual 1D index
 int index(int i, int j, int k, int n) {
   return i*n*n + j*n + k;

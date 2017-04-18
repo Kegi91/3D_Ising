@@ -64,6 +64,33 @@ double E(int i, int j, int k, int *array, int n, double J) {
   return J*array[index(i,j,k,n)]*(left+right+up+down+front+back);
 }
 
+//Total energy of the lattice
+double E_total(int *array, int n, double J) {
+  double E_tot = 0;
+
+  //summing over all spins
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      for (int k = 0; k < n; k++) {
+        E_tot += E(i,j,k,array,n,J);
+      }
+    }
+  }
+
+  return E_tot;
+}
+
+int M_total(int *array, int n) {
+  int size = n*n*n;
+  int M_tot = 0;
+
+  for (int i = 0; i < size; i++) {
+      M_tot += array[i];
+  }
+
+  return M_tot;
+}
+
 /*Returns an array of all the Boltzmann factors
   corresponding to different energies E<0.
   The factors are calculated beforehand to avoid
@@ -104,7 +131,8 @@ int update_spin(int n, int i, int j, int k,
 }
 
 //A single simulation
-double *simulation(int n, int mc_steps, int trans_steps, double T, double J) {
+double *simulation(int n, int mc_steps, int trans_steps, double T,
+                   double J, pcg32_random_t rng) {
   /*This function initializes the spin array and runs the simulation
     using Metropolis algorithm to find the minimum of the free energy.
 
@@ -132,22 +160,58 @@ double *simulation(int n, int mc_steps, int trans_steps, double T, double J) {
     J =           The coupling constant of the spin interaction
   */
 
-  pcg32_random_t rng;
-  seed(&rng);
-  /*If multiple simulations are run the PRNG is seeded each time
-    Since the seed uses both system time and the address of the pointer &rng
-    it is highly unlikely the same seed is given*/
-
   int *spins = initial_array(n, &rng);
   double *b_factors = boltzmann_factors(T,J);
+  int i,j,k;
 
-  //Transient steps
-  for (int i = 0; i < trans_steps; i++) {
-    for (int j = 0; j < n*n*n; j++) {
-      //update_spin();
+  //Transient mc steps
+  for (int mc = 0; mc < trans_steps; mc++) {
+    for (int m = 0; m < n*n*n; m++) {
+      i = rand_int(n, &rng);
+      j = rand_int(n, &rng);
+      k = rand_int(n, &rng);
+      update_spin(n,i,j,k,spins,b_factors,J,&rng);
     }
   }
 
+  //Calculating the physical quantities before starting the main loop
+  double E_curr = E_total(spins, n, J);
+  double M_curr = M_total(spins, n);
+  double E_tot = 0, Mabs_tot = 0, E2_tot = 0, M2_tot = 0, M4_tot = 0;
+
+  //Main loop where the averages are calculated
+  for (int mc = 0; mc < mc_steps; mc++) {
+    for (int m = 0; m < n*n*n; m++) {
+      i = rand_int(n, &rng);
+      j = rand_int(n, &rng);
+      k = rand_int(n, &rng);
+
+      //Updating a single spin and the physical quantities
+      if (update_spin(n,i,j,k,spins,b_factors,J,&rng)) {
+        E_curr += 2*E(i, j, k, spins, n, J);
+        M_curr += 2*spins[index(i,j,k,n)];
+      }
+    }
+
+    /*Updating the averages in every MC loop
+      E_curr is divided be three since the energies
+      of each spin is counted three times*/
+    E_tot += E_curr/3;
+    E2_tot += pow(E_curr/3,2);
+    Mabs_tot += fabs(M_curr);
+    M2_tot += pow(M_curr, 2);
+    M4_tot += pow(M_curr, 4);
+  }
+
+  double norm = (double)1/(n*n*n*mc_steps);
+  double *ret = malloc_double(5);
+  ret[0] = E_tot*norm;
+  ret[1] = E2_tot*norm;
+  ret[2] = Mabs_tot*norm;
+  ret[3] = M2_tot*norm;
+  ret[4] = M4_tot*norm;
+
   free(spins);
-  return NULL;
+  free(b_factors);
+  return ret;
 }

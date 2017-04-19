@@ -1,27 +1,18 @@
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include "ising.h"
-#include "utils.h"
-#include "pcg/pcg_basic.h"
+#include "run.h"
 
 //Testing the function simulation()
 int main() {
-  pcg32_random_t rng;
-  seed(&rng);
-  int n = 10;
+  int size = 10;
   double J = -1;
-
   double T[] = {1,2,3,4,5,6,7,8,9,10};
-  double *results;
+  int t_len = 10;
+  int sizes[] = {2,4,8,16};
+  int sizes_len = 4;
+  int mc = 1e3;
+  int trans = 1e3;
 
-  for (int i = 0; i < 10; i++) {
-    results = simulation(n,5e4,1e4,T[i],J,rng);
-    for (int j = 0; j < 5; j++) {
-      printf("%f\t", results[j]);
-    }
-    printf("\n");
-  }
+  run_n_simul(T, J, t_len, size, mc, trans, "output");
+//  run_multiple_sizes(T, t_len, sizes, sizes_len, J, mc, trans, "output");
 
   return 0;
 }

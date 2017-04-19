@@ -31,7 +31,7 @@ int *malloc_int(int n) {
 }
 
 double *malloc_double(int n) {
-  double *array = malloc(n*n*n*sizeof(double));
+  double *array = malloc(n*sizeof(double));
   if (array == NULL) {
     fprintf(stderr, "%s\n", "ERROR allocating memory");
   }

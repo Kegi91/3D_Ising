@@ -1,4 +1,4 @@
-SRC_FILES=main.c ising.c utils.c pcg/pcg_basic.c
+SRC_FILES=main.c ising.c utils.c pcg/pcg_basic.c run.c
 
 all: main
 

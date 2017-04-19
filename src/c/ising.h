@@ -1,7 +1,8 @@
 #include "pcg/pcg_basic.h"
 
+int *initial_array(int n);
 
-int* initial_array(int n, pcg32_random_t *rng);
+int* initial_array_random(int n, pcg32_random_t *rng);
 
 double E(int i, int j, int k, int *array, int n, double J);
 

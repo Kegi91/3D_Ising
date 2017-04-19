@@ -5,8 +5,19 @@
 #include "pcg/pcg_basic.h"
 #include "ising.h"
 
+//initializing array with all spins 1
+int *initial_array(int n) {
+  int *array = malloc_int(n);
+
+  for (int i = 0; i<n*n*n; i++) {
+    array[i] = 1;
+  }
+
+  return array;
+}
+
 //initializing the array with random spin configuration
-int *initial_array(int n, pcg32_random_t *rng) {
+int *initial_array_random(int n, pcg32_random_t *rng) {
   int *array = malloc_int(n);
 
   for (int i = 0; i<n*n*n; i++) {
@@ -120,7 +131,13 @@ int update_spin(int n, int i, int j, int k,
 
   double En = E(i,j,k,array,n,J);
   int idx = fabs(En/J)+0.1; //+0.1 to negotiate floating point inaccuracy
-  double b_factor = b_factors[idx-1];
+
+  double b_factor;
+  if (idx > 0) { //to not call b_factors[-1]
+    b_factor = b_factors[idx-1];
+  } else {
+    b_factor = 0;
+  }
 
   if (En > 0 || rand_d(rng) < b_factor) {
     array[index(i,j,k,n)] = array[index(i,j,k,n)] * -1;
@@ -160,7 +177,7 @@ double *simulation(int n, int mc_steps, int trans_steps, double T,
     J =           The coupling constant of the spin interaction
   */
 
-  int *spins = initial_array(n, &rng);
+  int *spins = initial_array(n);
   double *b_factors = boltzmann_factors(T,J);
   int i,j,k;
 

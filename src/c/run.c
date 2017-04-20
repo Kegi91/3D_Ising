@@ -55,8 +55,8 @@ void run_plotting() {
   int t_len = 20;
   int sizes[] = {20,25,30,40};
   int sizes_len = 4;
-  int mc = 5e2;
-  int trans = 5e2;
+  int mc = 1e4;
+  int trans = 1e3;
 
  run_multiple_sizes(T, t_len, sizes, sizes_len, J, mc, trans, "output");
 

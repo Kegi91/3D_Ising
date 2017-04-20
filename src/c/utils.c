@@ -42,3 +42,13 @@ double *malloc_double(int n) {
 int index(int i, int j, int k, int n) {
   return i*n*n + j*n + k;
 }
+
+double *linspace(double min, double max, int n) {
+    double *ret = malloc_double(n);
+
+    for (int i = 0; i < n; i++){
+        ret[i] = min + i*(max-min)/(n-1);  
+    }
+
+    return ret;
+}

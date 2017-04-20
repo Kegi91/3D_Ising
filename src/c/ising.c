@@ -220,13 +220,16 @@ double *simulation(int n, int mc_steps, int trans_steps, double T,
     M4_tot += pow(M_curr, 4);
   }
 
-  double norm = (double)1/(n*n*n*mc_steps);
-  double *ret = malloc_double(5);
-  ret[0] = E_tot*norm;
-  ret[1] = E2_tot*norm;
-  ret[2] = Mabs_tot*norm;
-  ret[3] = M2_tot*norm;
-  ret[4] = M4_tot*norm;
+  double norm = 1.0/(n*n*n*mc_steps);
+  double *ret = malloc_double(8);
+  ret[0] = E_tot*norm; //mean energy
+  ret[1] = E2_tot*norm; //mean energy^2
+  ret[2] = Mabs_tot*norm; //mean |magnetization|
+  ret[3] = M2_tot*norm; //mean magnetization^2
+  ret[4] = M4_tot*norm; //mean magnetization^4
+  ret[5] = (ret[1]-(ret[0]*ret[0]*n*n*n))/(T*T); //heat capacity
+  ret[6] = (ret[3]-(ret[2]*ret[2]*n*n*n))/T; //magnetic susceptibility
+  ret[7] = 1-ret[4]/(3*ret[3]*ret[3]); //binder cumulant
 
   free(spins);
   free(b_factors);

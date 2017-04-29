@@ -19,7 +19,7 @@ void run_n_simul(double *T, double J, int n, int size, int mc, int trans, char *
 
   for (int i = 0; i < n; i++) {
     results = simulation(size,mc,trans,T[i],J,rng);
-    for (int j = 0; j < 8; j++) {
+    for (int j = 0; j < 9; j++) {
       fprintf(f, "%.8f\t", results[j]);
     }
     fprintf(f,"\n");
@@ -50,15 +50,14 @@ void run_multiple_sizes(double *T, int t_len, int *sizes, int sizes_len,
 }
 
 void run_plotting() {
-  double J = -1;
-  double *T = linspace(1,8,20);
-  int t_len = 20;
-  int sizes[] = {20,25,30,40};
-  int sizes_len = 4;
+  double J = 1;
+  int t_len = 30;
+  double *T = linspace(4.4,4.6,t_len);
+  int sizes[] = {8,16};
+  int sizes_len = 2;
   int mc = 1e4;
-  int trans = 1e3;
+  int trans = 1e4;
 
- run_multiple_sizes(T, t_len, sizes, sizes_len, J, mc, trans, "output");
-
- free(T);
+  run_multiple_sizes(T, t_len, sizes, sizes_len, J, mc, trans, "run");
+  free(T);
 }

@@ -72,7 +72,7 @@ double E(int i, int j, int k, int *array, int n, double J) {
     front = array[index(i,j,k-1,n)];
   }
 
-  return J*array[index(i,j,k,n)]*(left+right+up+down+front+back);
+  return -1*J*array[index(i,j,k,n)]*(left+right+up+down+front+back);
 }
 
 //Total energy of the lattice
@@ -221,15 +221,16 @@ double *simulation(int n, int mc_steps, int trans_steps, double T,
   }
 
   double norm = 1.0/(n*n*n*mc_steps);
-  double *ret = malloc_double(8);
+  double *ret = malloc_double(9);
   ret[0] = E_tot*norm; //mean energy
   ret[1] = E2_tot*norm; //mean energy^2
   ret[2] = Mabs_tot*norm; //mean |magnetization|
   ret[3] = M2_tot*norm; //mean magnetization^2
   ret[4] = M4_tot*norm; //mean magnetization^4
-  ret[5] = (ret[1]-(ret[0]*ret[0]*n*n*n))/(T*T); //heat capacity
+  ret[5] = (ret[1]-(ret[0]*ret[0]*n*n*n))/T; //heat capacity
   ret[6] = (ret[3]-(ret[2]*ret[2]*n*n*n))/T; //magnetic susceptibility
-  ret[7] = 1-ret[4]/(3*ret[3]*ret[3]); //binder cumulant
+  ret[7] = 1-(ret[4]/(3*ret[3]*ret[3]*n*n*n)); //binder cumulant
+  ret[8] = T; //temperature
 
   free(spins);
   free(b_factors);

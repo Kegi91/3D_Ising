@@ -1,6 +1,6 @@
 #include "run.h"
+#include "ising.h"
 
-//Testing the function simulation()
 int main() {
   run_plotting();
 

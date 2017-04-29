@@ -9,53 +9,58 @@ def custom_label(i):
     elif i == 3:
         return "$n=30$"
     elif i == 4:
-        return "$n=40$"
+        return "$n=35$"
 
-T = np.linspace(1,8,20);
-n = 4
+fname = "new"
+runs = 4
+T = np.loadtxt("../../output/new1.dat")[:,8]
 
-for i in range(1,n+1):
-    data = np.loadtxt("../../output/output" + str(i) + ".dat")
+for i in range(1,runs+1):
+    data = np.loadtxt("../../output/" + fname + str(i) + ".dat")
     plt.plot(T,data[:,2],'o-',label=custom_label(i))
 
 plt.xlabel("$T$")
 plt.ylabel(r"$\left\langle |m| \right\rangle $")
 plt.legend()
+plt.grid(True)
 plt.title("Mean magnetization")
 plt.savefig("../../pics/mean_magnetization.png")
 plt.clf()
 
-for i in range(1,n+1):
-    data = np.loadtxt("../../output/output" + str(i) + ".dat")
+for i in range(1,runs+1):
+    data = np.loadtxt("../../output/" + fname + str(i) + ".dat")
     plt.plot(T,data[:,0],'o-',label=custom_label(i))
 
 plt.xlabel("$T$")
 plt.ylabel(r"$\left\langle E \right\rangle $")
 plt.legend(loc=4)
+plt.grid(True)
 plt.title("Mean energy")
 plt.savefig("../../pics/mean_energy.png")
 plt.clf()
 
-for i in range(1,n+1):
-    data = np.loadtxt("../../output/output" + str(i) + ".dat")
+for i in range(1,runs+1):
+    data = np.loadtxt("../../output/" + fname + str(i) + ".dat")
     C = data[:,5]
     plt.plot(T,C,'o-',label=custom_label(i))
 
 plt.xlabel("$T$")
 plt.ylabel(r"$c_V$")
 plt.legend()
+plt.grid(True)
 plt.title("Heat capacity")
 plt.savefig("../../pics/heat_capacity.png")
 plt.clf()
 
-for i in range(1,n+1):
-    data = np.loadtxt("../../output/output" + str(i) + ".dat")
+for i in range(1,runs+1):
+    data = np.loadtxt("../../output/" + fname + str(i) + ".dat")
     X = data[:,6]
     plt.plot(T,X,'o-',label=custom_label(i))
 
 plt.xlabel("$T$")
 plt.ylabel(r"$\chi$")
 plt.legend()
+plt.grid(True)
 plt.title("Magnetic susceptibility")
 plt.savefig("../../pics/susceptibility.png")
 plt.clf()

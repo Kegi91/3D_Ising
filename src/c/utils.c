@@ -26,6 +26,7 @@ int *malloc_int(int n) {
   int *array = malloc(n*n*n*sizeof(int));
   if (array == NULL) {
     fprintf(stderr, "%s\n", "ERROR allocating memory");
+    exit(1);
   }
   return array;
 }
@@ -34,6 +35,7 @@ double *malloc_double(int n) {
   double *array = malloc(n*sizeof(double));
   if (array == NULL) {
     fprintf(stderr, "%s\n", "ERROR allocating memory");
+    exit(1);
   }
   return array;
 }
@@ -47,8 +49,30 @@ double *linspace(double min, double max, int n) {
     double *ret = malloc_double(n);
 
     for (int i = 0; i < n; i++){
-        ret[i] = min + i*(max-min)/(n-1);  
+        ret[i] = min + i*(max-min)/(n-1);
     }
 
     return ret;
+}
+
+int *linspace_int(int sizes_min, int sizes_max, int step) {
+  if (sizes_min > sizes_max) {
+    fprintf(stderr, "%s\n", "Invalid number of lattices");
+    exit(1);
+  }
+
+  int *array = malloc(((sizes_max-sizes_min)/step+1)*sizeof(int));
+  if (array == NULL) {
+    fprintf(stderr, "%s\n", "ERROR allocating memory");
+    exit(1);
+  }
+
+  int i = 0;
+  while (sizes_min <= sizes_max) {
+    array[i] = sizes_min;
+    i++;
+    sizes_min += step;
+  }
+
+  return array;
 }

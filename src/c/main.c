@@ -2,7 +2,7 @@
 #include "ising.h"
 
 int main() {
-  run_plotting();
+  read_n_run();
 
   return 0;
 }

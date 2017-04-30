@@ -11,9 +11,9 @@ def custom_label(i):
     elif i == 4:
         return "$n=35$"
 
-fname = "new"
+fname = "plots"
 runs = 4
-T = np.loadtxt("../../output/new1.dat")[:,8]
+T = np.loadtxt("../../output/" + fname + "1.dat")[:,8]
 
 for i in range(1,runs+1):
     data = np.loadtxt("../../output/" + fname + str(i) + ".dat")

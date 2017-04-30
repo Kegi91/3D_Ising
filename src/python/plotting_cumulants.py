@@ -17,18 +17,17 @@ def custom_color(i):
     if i == 3:
         return 'green'
 
-lower_lim = 4
-upper_lim = 5
-T = np.linspace(lower_lim,upper_lim,50)
 n = 4
 fname = "cumulants"
+T = np.loadtxt("../../output/" + fname + "1.dat")[:,8]
+
 
 for i in range(1,n):
     data = np.loadtxt("../../output/" + fname + str(i) + ".dat")
     U = data[:,7]
     plt.plot(T,U,'o-',label=custom_label(i),color=custom_color(i))
 
-plt.xlim(lower_lim, upper_lim)
+plt.xlim(T[0], T[-1])
 plt.legend(loc=3)
 plt.xlabel("$T$")
 plt.ylabel("$U_L$")

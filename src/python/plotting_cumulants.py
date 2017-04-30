@@ -21,7 +21,6 @@ n = 4
 fname = "cumulants"
 T = np.loadtxt("../../output/" + fname + "1.dat")[:,8]
 
-
 for i in range(1,n):
     data = np.loadtxt("../../output/" + fname + str(i) + ".dat")
     U = data[:,7]

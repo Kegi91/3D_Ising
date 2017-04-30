@@ -10,8 +10,10 @@ def custom_label(i):
         return "$n=30$"
     elif i == 4:
         return "$n=35$"
+    else:
+        return ""
 
-fname = "plots"
+fname = "run"
 runs = 4
 T = np.loadtxt("../../output/" + fname + "1.dat")[:,8]
 

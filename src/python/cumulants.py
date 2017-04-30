@@ -76,7 +76,7 @@ for j in range(runs):
     binder_cumulants.append(T_c)
     print("%d/%d\t%f"%(j+1,runs,T_c))
 
-f = open("../../output/critical_temps1.dat","w")
+f = open("../../output/critical_temps.dat","w")
 for i in range(len(binder_cumulants)):
     f.write(str(binder_cumulants[i]) + "\n")
 f.close()

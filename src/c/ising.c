@@ -148,8 +148,11 @@ int update_spin(int n, int i, int j, int k,
 }
 
 //A single simulation
-double *simulation(int n, int mc_steps, int trans_steps, double T,
-                   double J, pcg32_random_t rng) {
+double *simulation(
+  int n, int mc_steps, int trans_steps, int calc,
+  double T, double J, pcg32_random_t rng
+) {
+
   /*This function initializes the spin array and runs the simulation
     using Metropolis algorithm to find the minimum of the free energy.
 
@@ -181,6 +184,8 @@ double *simulation(int n, int mc_steps, int trans_steps, double T,
   double *b_factors = boltzmann_factors(T,J);
   int i,j,k;
 
+  int samples = 0;
+
   //Transient mc steps
   for (int mc = 0; mc < trans_steps; mc++) {
     for (int m = 0; m < n*n*n; m++) {
@@ -210,17 +215,19 @@ double *simulation(int n, int mc_steps, int trans_steps, double T,
       }
     }
 
-    /*Updating the averages in every MC loop
-      E_curr is divided be three since the energies
-      of each spin is counted three times*/
-    E_tot += E_curr/3;
-    E2_tot += pow(E_curr/3,2);
-    Mabs_tot += fabs(M_curr);
-    M2_tot += pow(M_curr, 2);
-    M4_tot += pow(M_curr, 4);
+    // Updating physical quantities every calc mc steps
+    if (mc % calc == 0) {
+      E_tot += E_curr/3;
+      E2_tot += pow(E_curr/3,2);
+      Mabs_tot += fabs(M_curr);
+      M2_tot += pow(M_curr, 2);
+      M4_tot += pow(M_curr, 4);
+
+      samples++;
+    }
   }
 
-  double norm = 1.0/(n*n*n*mc_steps);
+  double norm = 1.0/(n*n*n*samples);
   double *ret = malloc_double(9);
   ret[0] = E_tot*norm; //mean energy
   ret[1] = E2_tot*norm; //mean energy^2

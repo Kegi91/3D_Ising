@@ -40,7 +40,7 @@ binder_cumulants = []
 runs = 100
 
 for j in range(runs):
-    os.system("../c/main")
+    os.system("../cuda/main")
 
     if j == 0:
         T = np.loadtxt("../../output/run1.dat")[:,8]

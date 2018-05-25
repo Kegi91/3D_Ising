@@ -9,4 +9,8 @@ clean:
 	rm -f main
 
 run: main
-	./main
+	./main run_from_input ../../input/input.dat
+
+plots:
+	python3 ../python/plots.py
+	eog ../../pics/

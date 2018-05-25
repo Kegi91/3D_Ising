@@ -1,17 +1,15 @@
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "run.h"
-#include "utils.h"
 
-#define functions_len 1
+#define functions_len 2
 char functions[functions_len][100] = {
-  "run_from_input: input_file"
+  "read_n_run:\tinput_file",
+  "benchmark:\tinput_file"
 };
 
 void err_msg();
-void run_from_input(char f_in[]);
 
 int main(int argc, char **argv) {
   if (argc < 3) {
@@ -19,7 +17,9 @@ int main(int argc, char **argv) {
     exit(0);
   }
 
-  if (strcmp(argv[argc-2], "run_from_input") == 0) run_from_input(argv[argc-1]);
+  if (strcmp(argv[argc-2], "read_n_run") == 0) read_n_run(argv[argc-1]);
+  else if (strcmp(argv[argc-2], "benchmark") == 0) benchmark(argv[argc-1]);
+  else err_msg();
 
   return 0;
 }
@@ -36,8 +36,4 @@ void err_msg() {
   for (int i = 0; i < functions_len; i++) {
     fprintf(stderr, "%s\n", functions[i]);
   }
-}
-
-void run_from_input(char *f_in) {
-  read_n_run(f_in);
 }

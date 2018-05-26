@@ -9,7 +9,10 @@ clean:
 	rm -f main
 
 run: main
-	./main run_from_input ../../input/input.dat
+	./main read ../../input/input.dat
+
+benchmark: main
+	./main benchmark ../../input/benchmark.dat
 
 plots:
 	python3 ../python/plots.py

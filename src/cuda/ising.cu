@@ -232,7 +232,6 @@ float *run_simulation(
     update_spins<<<grid_size, block_half>>>(
       n, spins_d, b_factors_d, J, which, rng_d
     );
-    cudaDeviceSynchronize();
   }
 
   float *E_h, *E_d, *M_h, *M_d;
@@ -257,7 +256,6 @@ float *run_simulation(
       update_spins<<<grid_size, block_half>>>(
         n, spins_d, b_factors_d, J, which, rng_d
       );
-      cudaDeviceSynchronize();
 
     }
 
@@ -271,9 +269,7 @@ float *run_simulation(
       cudaMemcpy(M_d, M_h, sizeof(float), cudaMemcpyHostToDevice);
 
       E_total<<<grid_size, block_whole>>>(spins_d, n, J, E_d);
-      cudaDeviceSynchronize();
       M_total<<<grid_size, block_whole>>>(spins_d, n, M_d);
-      cudaDeviceSynchronize();
 
       cudaMemcpy(M_h, M_d, sizeof(float), cudaMemcpyDeviceToHost);
       cudaMemcpy(E_h, E_d, sizeof(float), cudaMemcpyDeviceToHost);

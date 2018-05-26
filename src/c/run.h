@@ -7,3 +7,4 @@ void run_multiple_sizes(
   double J, int mc, int trans, int calc, char *file
 );
 void read_n_run();
+void benchmark(char f_in[]);

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <time.h>
 
 #include "utils.h"
 #include "ising.h"
@@ -102,74 +103,74 @@ void read_n_run(char *f_in) {
   gpuErrchk(cudaPeekAtLastError());
 }
 
- void benchmark(char f_in[]) {
+void benchmark(char f_in[]) {
 
-   // Reading all the parameters
-   FILE *fp = fopen(f_in,"r");
-   if (fp == NULL) exit(1);
+  // Reading all the parameters
+  FILE *fp = fopen(f_in,"r");
+  if (fp == NULL) exit(1);
 
-   char buffer[100];
-   int J;
-   float T_min, T_max;
-   int T_len, sizes_min, sizes_max, step;
-   int mc, trans, calc;
-   char fname[100];
+  char buffer[100];
+  int J;
+  float T_min, T_max;
+  int T_len, sizes_min, sizes_max, step;
+  int mc, trans, calc;
+  char fname[100];
 
-   // Reading the parameters
-   if (fgets(buffer, 100, fp) == NULL) exit(1);
-   if (fscanf(fp," %d ", &J) == 0) exit(1);
-   if (fgets(buffer, 100, fp) == NULL) exit(1);
-   if (fscanf(fp," %f %f %d ", &T_min, &T_max, &T_len) == 0) exit(1);
-   if (fgets(buffer, 100, fp) == NULL) exit(1);
-   if (fscanf(fp," %d %d %d ", &sizes_min, &sizes_max, &step) == 0) exit(1);
-   if (fgets(buffer, 100, fp) == NULL) exit(1);
-   if (fscanf(fp," %d %d %d ", &mc, &trans, &calc) == 0) exit(1);
-   if (fgets(buffer, 100, fp) == NULL) exit(1);
-   if (fscanf(fp,"%s", fname) == 0) exit(1);
-   fclose(fp);
+  // Reading the parameters
+  if (fgets(buffer, 100, fp) == NULL) exit(1);
+  if (fscanf(fp," %d ", &J) == 0) exit(1);
+  if (fgets(buffer, 100, fp) == NULL) exit(1);
+  if (fscanf(fp," %f %f %d ", &T_min, &T_max, &T_len) == 0) exit(1);
+  if (fgets(buffer, 100, fp) == NULL) exit(1);
+  if (fscanf(fp," %d %d %d ", &sizes_min, &sizes_max, &step) == 0) exit(1);
+  if (fgets(buffer, 100, fp) == NULL) exit(1);
+  if (fscanf(fp," %d %d %d ", &mc, &trans, &calc) == 0) exit(1);
+  if (fgets(buffer, 100, fp) == NULL) exit(1);
+  if (fscanf(fp,"%s", fname) == 0) exit(1);
+  fclose(fp);
 
-   float *T = linspace(T_min, T_max, T_len);
-   int *sizes = linspace_int(sizes_min, sizes_max, step);
-   int sizes_len = (sizes_max-sizes_min)/step+1;
+  float *T = linspace(T_min, T_max, T_len);
+  int *sizes = linspace_int(sizes_min, sizes_max, step);
+  int sizes_len = (sizes_max-sizes_min)/step+1;
 
-   struct timespec start, stop;
-   double accum;
+  struct timespec start, stop;
+  double accum;
 
-   // Sizes
-   for (int i = 0; i<sizes_len; i++) {
-     // Initializing in both host and device
-     pcg32_random_t *rng_h, *rng_d;
-     int rng_num = ceil(sizes[i]*sizes[i]*sizes[i] / 2.0);
-     rng_h = seed(rng_num);
-     allocate_rng_d(&rng_d, rng_num);
-     cudaMemcpy(
-       rng_d, rng_h,
-       rng_num * sizeof(pcg32_random_t),
-       cudaMemcpyHostToDevice
-     );
+  // Sizes
+  for (int i = 0; i<sizes_len; i++) {
+    // Initializing in both host and device
+    pcg32_random_t *rng_h, *rng_d;
+    int rng_num = ceil(sizes[i]*sizes[i]*sizes[i] / 2.0);
+    rng_h = seed(rng_num);
+    allocate_rng_d(&rng_d, rng_num);
+    cudaMemcpy(
+      rng_d, rng_h,
+      rng_num * sizeof(pcg32_random_t),
+      cudaMemcpyHostToDevice
+    );
 
-     clock_gettime(CLOCK_MONOTONIC, &start);
+    clock_gettime(CLOCK_MONOTONIC, &start);
 
-     // Temps
-     for (int j = 0; j < T_len; j++) {
+    // Temps
+    for (int j = 0; j < T_len; j++) {
 
       //  Average over 10 repeats
-       for (int repeat = 0; repeat < 10; repeat++) {
-         run_simulation(sizes[i], mc, trans, calc, T[j], J, rng_h, rng_d);
-       }
+      for (int repeat = 0; repeat < 10; repeat++) {
+        run_simulation(sizes[i], mc, trans, calc, T[j], J, rng_h, rng_d);
+      }
 
-     }
+    }
 
-     clock_gettime(CLOCK_MONOTONIC, &stop);
-     accum = (stop.tv_sec-start.tv_sec) + (stop.tv_nsec-start.tv_nsec) / 1e9;
-     accum /= 10;
+    clock_gettime(CLOCK_MONOTONIC, &stop);
+    accum = (stop.tv_sec-start.tv_sec) + (stop.tv_nsec-start.tv_nsec) / 1e9;
+    accum /= 10;
 
-     printf("%d\t%lf\n", sizes[i], accum);
+    printf("%d\t%lf\n", sizes[i], accum);
 
-     free(rng_h);
-     cudaFree(rng_d);
-   }
+    free(rng_h);
+    cudaFree(rng_d);
+  }
 
-   free(sizes);
-   free(T);
- }
+  free(sizes);
+  free(T);
+}

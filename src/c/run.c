@@ -1,10 +1,16 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "pcg/pcg_basic.h"
 #include "utils.h"
 #include "ising.h"
 #include "run.h"
+
+struct timespec {
+    time_t   tv_sec;        /* secondes */
+    long     tv_nsec;       /* nanosecondes */
+};
 
 //Running a n simulations with different temperatures T
 void run_n_simul(
@@ -84,6 +90,63 @@ void read_n_run() {
   int sizes_len = (sizes_max-sizes_min)/step+1;
 
   run_multiple_sizes(T, T_len, sizes, sizes_len, J, mc, trans, calc, fname);
+
+  free(sizes);
+  free(T);
+}
+
+void benchmark(char f_in[]) {
+
+  // Reading all the parameters
+  FILE *fp = fopen(f_in,"r");
+  if (fp == NULL) exit(1);
+
+  char buffer[100];
+  int J;
+  double T_min, T_max;
+  int T_len, sizes_min, sizes_max, step;
+  int mc, trans, calc;
+  char fname[100];
+
+  // Reading the parameters
+  if (fgets(buffer, 100, fp) == NULL) exit(1);
+  if (fscanf(fp," %d ", &J) == 0) exit(1);
+  if (fgets(buffer, 100, fp) == NULL) exit(1);
+  if (fscanf(fp," %lf %lf %d ", &T_min, &T_max, &T_len) == 0) exit(1);
+  if (fgets(buffer, 100, fp) == NULL) exit(1);
+  if (fscanf(fp," %d %d %d ", &sizes_min, &sizes_max, &step) == 0) exit(1);
+  if (fgets(buffer, 100, fp) == NULL) exit(1);
+  if (fscanf(fp," %d %d %d ", &mc, &trans, &calc) == 0) exit(1);
+  if (fgets(buffer, 100, fp) == NULL) exit(1);
+  if (fscanf(fp,"%s", fname) == 0) exit(1);
+  fclose(fp);
+
+  double *T = linspace(T_min, T_max, T_len);
+  int *sizes = linspace_int(sizes_min, sizes_max, step);
+  int sizes_len = (sizes_max-sizes_min)/step+1;
+
+  clock_t start, stop;
+  double accum;
+
+  // Sizes
+  for (int i = 0; i<sizes_len; i++) {
+
+    // Initializing RNG
+    pcg32_random_t rng;
+    seed(&rng);
+
+    start = clock();
+
+    // Temps
+    for (int j = 0; j < T_len; j++) {
+      simulation(sizes[i], mc, trans, calc, T[j], J, rng);
+    }
+
+    stop = clock();
+    accum = (stop - start) / (double) CLOCKS_PER_SEC;
+
+    printf("%d\t%lf\n", sizes[i], accum);
+  }
 
   free(sizes);
   free(T);

@@ -2,13 +2,13 @@ double J:
 1
 
 double T_min; double T_max; int T_len:
-4.5	4.5	1
+8	8	1
 
 int sizes_min; int sizes_max; int step:
-20	130	5
+35	35	5
 
 int mc; int trans; int calc:
-1000	100	1
+10000	2000	5
 
 char *fname:
 run

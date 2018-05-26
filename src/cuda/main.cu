@@ -5,7 +5,7 @@
 
 #define functions_len 2
 char functions[functions_len][100] = {
-  "read_n_run:\tinput_file",
+  "read:\t\tinput_file",
   "benchmark:\tinput_file"
 };
 
@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
     exit(0);
   }
 
-  if (strcmp(argv[argc-2], "read_n_run") == 0) read_n_run(argv[argc-1]);
+  if (strcmp(argv[argc-2], "read") == 0) read_n_run(argv[argc-1]);
   else if (strcmp(argv[argc-2], "benchmark") == 0) benchmark(argv[argc-1]);
   else err_msg();
 
@@ -29,7 +29,7 @@ void err_msg() {
     stderr,
     "%s\n\n%s\n\n%s\n\n",
     "Give function and parameters as cmd line parameters e.g.",
-    "./main run_from_input ../../input/input.dat",
+    "./main read ../../input/input.dat",
     "The supported functions and parameters are [function: ...]:"
   );
 

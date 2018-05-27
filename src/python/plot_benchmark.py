@@ -19,7 +19,7 @@ for i,fname in enumerate(files):
     plt.xlabel("Lattice size (n)")
     plt.ylabel("Seconds per single spin flip")
 
-    plt.semilogy(size, t/size**3, label=labels[i])
+    plt.semilogy(size, t/(size**3 * 1100), label=labels[i])
     plt.legend()
 
 plt.savefig("../../pics/benchmark")

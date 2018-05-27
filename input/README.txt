@@ -17,6 +17,8 @@ increment step.
 
 mc, trans = Number of Monte Carlo and transient steps of each run.
 
+calc = Physical quantities are calculated every calc MC steps
+
 fname = The name of the output file.
 
 

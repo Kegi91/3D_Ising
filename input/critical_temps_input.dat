@@ -7,8 +7,8 @@ double T_min; double T_max; int T_len:
 int sizes_min; int sizes_max; int step:
 8	16	8
 
-int mc; int trans:
-10000	10000
+int mc; int trans, int calc:
+10000	10000	5
 
 char *fname:
 run

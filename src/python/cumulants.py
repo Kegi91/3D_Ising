@@ -40,7 +40,7 @@ binder_cumulants = []
 runs = 100
 
 for j in range(runs):
-    os.system("../cuda/main")
+    os.system("../cuda/main read ../../input/critical_temps_input.dat")
 
     if j == 0:
         T = np.loadtxt("../../output/run1.dat")[:,8]
